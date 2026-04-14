@@ -66,6 +66,7 @@ class Canteen(db.Model):
     slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     upi_id = db.Column(db.String(120), default="")
+    whatsapp_number = db.Column(db.String(20), default="")
     created_at = db.Column(db.DateTime, default=_utcnow)
 
     owner = db.relationship("User", foreign_keys=[owner_id])

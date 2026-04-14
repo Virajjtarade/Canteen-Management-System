@@ -30,6 +30,7 @@ def list_canteens():
                 "name": c.name,
                 "slug": c.slug,
                 "upi_id": c.upi_id,
+                "whatsapp_number": c.whatsapp_number,
             }
             for c in rows
         ]
@@ -56,6 +57,7 @@ def my_canteens():
                 "name": c.name,
                 "slug": c.slug,
                 "upi_id": c.upi_id,
+                "whatsapp_number": c.whatsapp_number,
             }
             for c in rows
         ]
@@ -86,10 +88,10 @@ def create_canteen():
         slug = f"{base}-{n}"
         n += 1
 
-    c = Canteen(name=name, slug=slug, owner_id=int(owner_id), upi_id=(data.get("upi_id") or ""))
+    c = Canteen(name=name, slug=slug, owner_id=int(owner_id), upi_id=(data.get("upi_id") or ""), whatsapp_number=(data.get("whatsapp_number") or ""))
     db.session.add(c)
     db.session.commit()
-    return jsonify({"id": c.id, "name": c.name, "slug": c.slug, "upi_id": c.upi_id}), 201
+    return jsonify({"id": c.id, "name": c.name, "slug": c.slug, "upi_id": c.upi_id, "whatsapp_number": c.whatsapp_number}), 201
 
 
 @bp.route("/<int:canteen_id>", methods=["PATCH"])
@@ -108,8 +110,10 @@ def update_canteen(canteen_id):
         c.name = data["name"].strip()
     if "upi_id" in data:
         c.upi_id = data["upi_id"] or ""
+    if "whatsapp_number" in data:
+        c.whatsapp_number = data["whatsapp_number"] or ""
     db.session.commit()
-    return jsonify({"id": c.id, "name": c.name, "slug": c.slug, "upi_id": c.upi_id})
+    return jsonify({"id": c.id, "name": c.name, "slug": c.slug, "upi_id": c.upi_id, "whatsapp_number": c.whatsapp_number})
 
 
 @bp.route("/<int:canteen_id>/staff", methods=["GET", "POST"])

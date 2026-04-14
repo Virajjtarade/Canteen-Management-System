@@ -18,6 +18,7 @@ def canteen_by_slug(slug):
             "name": c.name,
             "slug": c.slug,
             "upi_id": c.upi_id,
+            "whatsapp_number": c.whatsapp_number,
         }
     )
 
@@ -41,7 +42,7 @@ def menu_by_slug(slug):
 
     return jsonify(
         {
-            "canteen": {"id": c.id, "name": c.name, "slug": c.slug, "upi_id": c.upi_id},
+            "canteen": {"id": c.id, "name": c.name, "slug": c.slug, "upi_id": c.upi_id, "whatsapp_number": c.whatsapp_number},
             "items": [
                 {
                     "id": i.id,

@@ -122,7 +122,21 @@ export default function GuestMenu() {
     setCart((c) => ({ ...c, [id]: Math.max(0, (c[id] || 0) + delta) }));
   }
 
-  async function place() {
+  function formatReceipt(tokenNumber) {
+    let text = `Hello! I placed an order on the Smart Canteen.\n\n`;
+    text += `*Order Number*: #${tokenNumber}\n`;
+    text += `*Guest Name*: ${guestLabel}\n`;
+    text += `*Payment*: ${mode === "cash" ? "Cash at counter" : "UPI/Online"}\n\n`;
+    text += `*Items*:\n`;
+    lines.forEach(l => {
+      const it = data.items.find(x => x.id === l.menu_item_id);
+      text += `- ${l.quantity}x ${it.name} (₹${(l.quantity * it.price).toFixed(2)})\n`;
+    });
+    text += `\n*Total*: ₹${total.toFixed(2)}`;
+    return encodeURIComponent(text);
+  }
+
+  async function place(viaWhatsapp = false) {
     setMsg("");
     if (!guestLabel.trim()) {
       setMsg("Please enter your name before placing an order.");
@@ -154,6 +168,14 @@ export default function GuestMenu() {
         );
       } catch {
         // ignore
+      }
+
+      if (viaWhatsapp && data.canteen.whatsapp_number) {
+        setMsg(`Redirecting to WhatsApp to complete order...`);
+        setCart({});
+        const text = formatReceipt(order.token_number);
+        window.location.href = `https://wa.me/${data.canteen.whatsapp_number}?text=${text}`;
+        return;
       }
 
       setMsg(
@@ -268,14 +290,26 @@ export default function GuestMenu() {
       </div>
       <div className="card flex flex-wrap items-center gap-4">
         <p className="text-lg font-semibold">Total ₹{total.toFixed(2)}</p>
-        <button
-          type="button"
-          disabled={!lines.length}
-          onClick={place}
-          className="rounded-xl bg-brand px-6 py-2 font-semibold text-white disabled:opacity-50"
-        >
-          Place order
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={!lines.length}
+            onClick={() => place(false)}
+            className="rounded-xl bg-brand px-6 py-2 font-semibold text-white disabled:opacity-50"
+          >
+            Place order
+          </button>
+          {data.canteen.whatsapp_number && (
+            <button
+              type="button"
+              disabled={!lines.length}
+              onClick={() => place(true)}
+              className="rounded-xl bg-emerald-500 px-6 py-2 font-semibold text-white hover:bg-emerald-600 disabled:opacity-50 flex items-center gap-2"
+            >
+              Order via WhatsApp
+            </button>
+          )}
+        </div>
       </div>
       {msg && <p className="text-sm text-emerald-600">{msg}</p>}
       {ticket && (
